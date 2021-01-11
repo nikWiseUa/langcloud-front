@@ -1,0 +1,18 @@
+.w-full {
+  width: 100%;
+}
+.textRow {
+  position: relative;
+}
+.transition {
+  transition: none !important;
+}
+.translate {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  transition: opacity .3s;
+}
+.min-auto {
+  min-width: auto !important;
+}
