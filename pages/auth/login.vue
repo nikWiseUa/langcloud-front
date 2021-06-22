@@ -20,20 +20,17 @@
         >
         </v-text-field>
 
-        <v-checkbox
-          v-model="checkbox"
-          :rules="[(v) => !!v || 'You must agree to continue!']"
-          label="Do you agree?"
-          required
-        ></v-checkbox>
-
         <v-btn
           :disabled="!valid"
           color="success"
           class="mr-4"
-          @click="registerHandler"
+          @click="validate"
         >
-          Register
+          Validate
+        </v-btn>
+
+        <v-btn :disabled="!valid" color="success" class="mr-4" @click="auth">
+          Auth
         </v-btn>
 
         <v-btn color="error" class="mr-4" @click="reset"> Reset Form </v-btn>
@@ -61,19 +58,21 @@ export default {
       (v) => !!v || 'Pass is required',
       (v) => /[0-9a-z]{6,}/.test(v) || 'Pass must be 6 length or more',
     ],
-    checkbox: false,
   }),
-
   methods: {
-    ...mapActions({ register: 'auth/register' }),
-    async registerHandler() {
+    ...mapActions({ login: 'auth/login', openSnacbar: 'snackbar/openSnacbar' }),
+    async auth() {
       if (!this.$refs.form.validate()) return;
       const fData = {
         username: this.name,
         password: this.pass,
       };
-      const isTrueAuth = await this.register(fData);
-      isTrueAuth && this.$router.push('/profile');
+      const isTrueAuth = await this.login(fData);
+
+      if (isTrueAuth) {
+        this.openSnacbar({ time: 1800, text: 'succes login' });
+        this.$router.push('/profile');
+      }
     },
     validate() {
       this.$refs.form.validate();

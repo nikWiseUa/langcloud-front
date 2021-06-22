@@ -1,26 +1,33 @@
 <template>
   <v-row no-gutters class="my-9">
     <v-row no-gutters class="align-center justify-space-between">
-      <v-col v-if="textData.title">
+      <v-col v-if="textData.title" class="d-flex justify-space-around">
         <h2>{{ textData.title.en }}</h2>
+        <v-btn @click="acceptEndReadText"> i`m done it </v-btn>
       </v-col>
     </v-row>
     <v-row no-gutters class="my-6">
       <v-card
         ref="translateCard"
-        class="pa-2 translate transition"
+        class="pa-2 translate transition d-flex flex-column"
         elevation="2"
         shaped
         :style="`transform: translate(${position.x}px, ${position.y}px)`"
       >
-        {{ transText }}
+        <span class="text-h6 mb-2">{{ transData.text }}</span>
+        <img
+          v-if="transData.image"
+          :src="transData.image"
+          alt="here"
+          style="max-width: 260px"
+        />
       </v-card>
       <p class="text-h5 px-10">
         <span
           v-for="(word, ind) in post"
           :key="word + ind"
           class="word"
-          @dblclick.prevent="showTranslateTest"
+          @click.prevent="showTranslateTest"
         >
           {{ word }}
         </span>
@@ -66,15 +73,31 @@
   </v-row>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.word {
+  // margin: 13px 0 13px 10px;
+  padding: 0 7px;
+  border-radius: 4px;
+  word-spacing: -7px;
+  cursor: pointer;
+  &:hover {
+    background-color: #34495e;
+  }
+}
+</style>
 
 <script>
 export default {
   middleware: 'auth',
   async fetch() {
-    const textData = await fetch('http://localhost:3000/text/random', {
-      headers: { 'Content-Type': 'application/json' },
-    }).then((res) => res.json());
+    const textData = await fetch(
+      `http://localhost:3000/text/${this.$route.params.id}`,
+      {
+        headers: { 'Content-Type': 'application/json' },
+      },
+    ).then((res) => {
+      return res.json();
+    });
     this.post = textData.en.split(/[ ]/).map((e) => {
       e = e.replace('__', ' ');
       return e;
@@ -91,7 +114,10 @@ export default {
       sentences: '',
       words: {},
       lastMove: 0,
-      transText: '',
+      transData: {
+        text: '00',
+        image: '',
+      },
       position: {},
       localLang: 'ru',
       translateTimer: null,
@@ -103,16 +129,56 @@ export default {
       if (!word) return;
       this.showTranslate(word);
     },
-    setPositionTranslate(position) {
+    async acceptEndReadText() {
+      // textData.id;
+      try {
+        // console.log(JSON.stringify(this.textData));
+        await fetch(`http://localhost:3000/text/learned`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: this.textData }),
+        });
+      } catch (err) {
+        console.error(err);
+      }
+      this.$router.push('/texts');
+    },
+    async setPositionTranslate(position, wordTextContent) {
       this.$refs.translateCard.$el.classList.add('transition');
       this.$refs.translateCard.$el.style.opacity = 0;
-      const positionCenterXElement = position.left;
-      const positionCenterYElement = position.top - position.height - 15;
+      let positionCenterXElement = 0;
+      if (window.innerWidth < 600) {
+        positionCenterXElement = this.$refs.translateCard?.$el
+          ? window.innerWidth * 0.5 -
+            this.$refs.translateCard.$el.clientWidth * 0.5
+          : 0;
+      } else {
+        positionCenterXElement = position.left;
+      }
+      const positionCenterYElement = position.top + position.height + 5;
       this.position = {
         x: positionCenterXElement,
         y: positionCenterYElement,
       };
-
+      try {
+        const wordData = await fetch(
+          `http://localhost:3000/words/content?content=${wordTextContent}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        ).then((res) => res.json());
+        this.transData.image = wordData.image;
+      } catch (err) {
+        this.transData.image = '';
+        console.error(err);
+      }
       setTimeout(() => {
         this.$refs.translateCard.$el.classList.remove('transition');
         this.$refs.translateCard.$el.style.opacity = 1;
@@ -132,8 +198,11 @@ export default {
         const traslation = this.words[wordTextContent][this.localLang];
 
         if (traslation) {
-          this.transText = traslation;
-          this.setPositionTranslate(word.getBoundingClientRect());
+          this.transData.text = traslation;
+          this.setPositionTranslate(
+            word.getBoundingClientRect(),
+            wordTextContent,
+          );
         } else {
           this.$refs.translateCard.$el.style.opacity = 0;
         }

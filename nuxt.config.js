@@ -11,6 +11,13 @@ export default {
       { hid: 'description', name: 'description', content: '' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
+    script: [
+      {
+        type: 'text/javascript',
+        src:
+          'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js',
+      },
+    ],
   },
   server: {
     port: 8000, // default: 3000
@@ -20,6 +27,14 @@ export default {
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
   css: ['~/assets/addon.css'],
+
+  // Global JS
+  script: [
+    {
+      src:
+        'https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js',
+    },
+  ],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [],

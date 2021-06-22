@@ -9,18 +9,21 @@
     >
       <v-list>
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(item, i) in avalibleMenuList"
           :key="i"
           :to="item.to"
           router
           exact
+          @click="item.handler && item.handler()"
         >
-          <v-list-item-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-action>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-          </v-list-item-content>
+          <template>
+            <v-list-item-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.title" />
+            </v-list-item-content>
+          </template>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -63,29 +66,100 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex';
+
 export default {
   data() {
     return {
       clipped: false,
       drawer: false,
       fixed: false,
-      items: [
+      miniVariant: false,
+      right: true,
+      rightDrawer: false,
+      title: 'Lang Club',
+    };
+  },
+  computed: {
+    ...mapGetters({
+      snackbar: 'snackbar/snackbar',
+      text: 'snackbar/text',
+      authenticated: 'auth/authenticated',
+    }),
+    avalibleMenuList() {
+      return this.items.filter((el) => {
+        return (
+          el.authenticated === this.authenticated ||
+          el.authenticated === undefined
+        );
+      });
+    },
+    items() {
+      return [
         {
           icon: 'mdi-apps',
           title: 'Welcome',
           to: '/',
         },
         {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire',
+          icon: 'mdi-account-tie',
+          title: 'Profile',
+          to: '/profile',
+          authenticated: true,
         },
-      ],
-      miniVariant: false,
-      right: true,
-      rightDrawer: false,
-      title: 'FoxLang',
-    };
+        {
+          icon: 'mdi-script-text',
+          title: 'Texts',
+          to: '/texts',
+          authenticated: true,
+        },
+        {
+          icon: 'mdi-plus-circle-multiple-outline',
+          title: 'Register',
+          to: '/auth',
+          authenticated: false,
+        },
+        {
+          icon: 'mdi-login',
+          title: 'Login',
+          to: '/auth/login',
+          authenticated: false,
+        },
+        {
+          icon: 'mdi-book-open-page-variant',
+          title: 'Words',
+          to: '/words',
+          authenticated: true,
+        },
+        {
+          icon: 'mdi-clipboard-text-search',
+          title: 'Search',
+          to: '/words/search',
+          authenticated: true,
+        },
+        {
+          icon: 'mdi-logout-variant',
+          title: 'Logout',
+          handler: this.logoutHandler,
+          authenticated: true,
+        },
+      ];
+    },
+  },
+  mounted() {
+    this.tokenLogin();
+  },
+  methods: {
+    ...mapActions({
+      logout: 'auth/logout',
+      tokenLogin: 'auth/loginToken',
+      openSnacbar: 'snackbar/openSnacbar',
+      closeSnacbar: 'snackbar/closeSnacbar',
+    }),
+    logoutHandler() {
+      this.logout();
+      this.openSnacbar({ time: 1800, text: 'logout...' });
+    },
   },
 };
 </script>
