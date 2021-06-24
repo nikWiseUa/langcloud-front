@@ -120,7 +120,6 @@ export default {
       if (!this.validate) return;
       const { words, idioms, timeline, mode } = this;
       this.setGameSettings({ words, idioms, timeline, mode });
-      console.log(this.$router.push);
       this.$router.push(`/game/${this.chousedCategory.id}`, 1);
     },
     validate() {

@@ -91,7 +91,7 @@ export default {
   middleware: 'auth',
   async fetch() {
     const textData = await fetch(
-      `http://localhost:3000/text/${this.$route.params.id}`,
+      `${process.env.baseUrl}/text/${this.$route.params.id}`,
       {
         headers: { 'Content-Type': 'application/json' },
       },
@@ -131,9 +131,9 @@ export default {
     },
     async acceptEndReadText() {
       // textData.id;
+      // eslint-disable-next-line no-useless-catch
       try {
-        // console.log(JSON.stringify(this.textData));
-        await fetch(`http://localhost:3000/text/learned`, {
+        await fetch(`${process.env.baseUrl}/text/learned`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -142,7 +142,7 @@ export default {
           body: JSON.stringify({ text: this.textData }),
         });
       } catch (err) {
-        console.error(err);
+        throw err;
       }
       this.$router.push('/texts');
     },
@@ -165,7 +165,7 @@ export default {
       };
       try {
         const wordData = await fetch(
-          `http://localhost:3000/words/content?content=${wordTextContent}`,
+          `${process.env.baseUrl}/words/content?content=${wordTextContent}`,
           {
             method: 'GET',
             credentials: 'include',
@@ -177,7 +177,7 @@ export default {
         this.transData.image = wordData.image;
       } catch (err) {
         this.transData.image = '';
-        console.error(err);
+        throw err;
       }
       setTimeout(() => {
         this.$refs.translateCard.$el.classList.remove('transition');

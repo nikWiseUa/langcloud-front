@@ -10,12 +10,15 @@ export const mutations = {
 };
 export const actions = {
   findWords: throttle(async ({ commit }, text) => {
-    const words = await fetch(`http://localhost:3000/words/text?text=${text}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+    const words = await fetch(
+      `${process.env.baseUrl}/words/text?text=${text}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
       .then((res) => res.json())
       .catch((err) => new Error(err));
     commit('SET_WORDS', words);

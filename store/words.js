@@ -8,12 +8,15 @@ export const mutations = {
 };
 export const actions = {
   async getAllWords({ commit }, id) {
-    const words = await fetch(`http://localhost:3000/words/category?id=${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
+    const words = await fetch(
+      `${process.env.baseUrl}/words/category?id=${id}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    }).then((res) => res.json());
+    ).then((res) => res.json());
     commit('SET_WORDS', words);
   },
 };

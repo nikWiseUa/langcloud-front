@@ -16,7 +16,7 @@ export const mutations = {
 
 export const actions = {
   async login({ commit }, pushData) {
-    const resp = await fetch('http://localhost:3000/auth/login', {
+    const resp = await fetch(process.env.baseUrl + '/auth/login', {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -29,7 +29,7 @@ export const actions = {
     return validStatus;
   },
   async loginToken({ commit }) {
-    const a = await fetch('http://localhost:3000/auth/tokenAuth', {
+    const a = await fetch(process.env.baseUrl + '/auth/tokenAuth', {
       method: 'GET',
       credentials: 'include',
       headers: {
@@ -39,7 +39,7 @@ export const actions = {
     commit('loginIn', a);
   },
   async register({ commit }, pushData) {
-    const status = await fetch('http://localhost:3000/auth/register', {
+    const status = await fetch(process.env.baseUrl + '/auth/register', {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -52,7 +52,7 @@ export const actions = {
     return validStatus;
   },
   async logout({ commit }) {
-    await fetch('http://localhost:3000/auth/logout', {
+    await fetch(process.env.baseUrl + '/auth/logout', {
       method: 'POST',
       credentials: 'include',
       headers: {

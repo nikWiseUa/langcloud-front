@@ -24,7 +24,6 @@ export const mutations = {
     todo.done = !todo.done;
   },
   SET_USER_STATS(state, data) {
-    console.log(data);
     state.stats = data;
   },
 };
@@ -34,7 +33,7 @@ export const actions = {
     commit('add', 'dde');
   },
   async fetchUserStatistic({ commit }, data) {
-    const stats = await fetch('http://localhost:3000/profile/stats', {
+    const stats = await fetch(process.env.baseUrl + '/profile/stats', {
       method: 'GET',
       credentials: 'include',
       headers: {

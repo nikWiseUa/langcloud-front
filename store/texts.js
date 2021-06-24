@@ -9,13 +9,12 @@ export const mutations = {
 };
 export const actions = {
   async fetchTexts({ commit }) {
-    const texts = await fetch('http://localhost:3000/text', {
+    const texts = await fetch(process.env.baseUrl + '/text', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
     }).then((res) => res.json());
-    console.log(texts);
     commit('SET_TEXTS', texts);
   },
 };

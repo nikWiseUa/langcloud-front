@@ -72,7 +72,7 @@
 export default {
   middleware: 'auth',
   async fetch() {
-    const textData = await fetch('http://localhost:3000/text/random', {
+    const textData = await fetch(process.env.baseUrl + '/text/random', {
       headers: { 'Content-Type': 'application/json' },
     }).then((res) => res.json());
     this.post = textData.en.split(/[ ]/).map((e) => {

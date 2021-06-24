@@ -14,7 +14,7 @@ export const mutations = {
 };
 export const actions = {
   async getAllCategories({ commit }) {
-    const categories = await fetch(process.env.baseUrl + '/categories', {
+    const categories = await fetch(process.env.baseUrl + '/categories/test', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

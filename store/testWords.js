@@ -4,6 +4,8 @@ export const state = () => ({
   _wordsRepeat: [],
   _wordsDone: [],
   _wordsDoneNow: [],
+  _correctlyAnswers: 0,
+  _wordsCount: 0,
   _currentWord: {
     en: 'Error',
   },
@@ -15,6 +17,7 @@ export const state = () => ({
 export const mutations = {
   SET_WORDS(state, words) {
     state._words = words;
+    state._wordsCount = words.length;
   },
   SET_PULL_WORDS(state, words) {
     state._wordsPull = words;
@@ -27,19 +30,15 @@ export const mutations = {
       (word) => word.en !== state._currentWord.en,
     );
   },
+  RESET(state) {
+    state._correctlyAnswers = 0;
+    state._wordsCount = 0;
+    state._wordsPull = [];
+    state._wordsRepeat = [];
+    state._wordsDone = [];
+  },
   PUSH_DONE_WORDS_NOW(state, word) {
     state._wordsDone.push(word);
-    const data = JSON.stringify({
-      word,
-    });
-    fetch(process.env.baseUrl + '/words/learned', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: data,
-    });
   },
   SET_NEW_ANSWERS(state) {
     const forLoops = state._words.length < 4 ? state._words.length : 4;
@@ -70,6 +69,7 @@ export const mutations = {
   },
   SET_NEW_CURRENT_WORD(state) {
     const randomNum = Math.random() > 0.5;
+    console.log(state._wordsPull, state._wordsRepeat);
     let chousedList = randomNum ? state._wordsPull : state._wordsRepeat;
     state._currentWordList = randomNum ? '_wordsPull' : '_wordsRepeat';
     if (!chousedList.length) {
@@ -83,14 +83,14 @@ export const mutations = {
       state._currentWord = chousedList[chousedIndex];
     }
   },
-  TEST_CHOUSE(state, ind) {
-    //
+  TEST_CHOUSE(state, isTrue) {
+    isTrue && ++state._correctlyAnswers;
   },
 };
 export const actions = {
   async fetchLearnWords({ commit }, id) {
     const words = await fetch(
-      `${process.env.baseUrl}/words/category?id=${id}&type=learn`,
+      `${process.env.baseUrl}/words/category?id=${id}&type=test`,
       {
         method: 'GET',
         credentials: 'include',
@@ -103,6 +103,7 @@ export const actions = {
       .catch((err) => {
         throw err;
       });
+    commit('RESET', words ?? []);
     commit('SET_WORDS', words ?? []);
     commit('SET_PULL_WORDS', words);
   },
@@ -121,11 +122,13 @@ export const actions = {
     commit('SET_NEW_ANSWERS');
   },
   submitChouse({ state, commit }, ind) {
-    commit('TEST_CHOUSE', ind);
+    commit('TEST_CHOUSE', state._trueAnsverInd === ind);
     return state._trueAnsverInd === ind;
   },
 };
 export const getters = {
+  getCorrectlyAnswersCount: (s) => s._correctlyAnswers,
+  getWordsCount: (s) => s._wordsCount,
   getWords: (s) => s._words,
   getWordsPull: (s) => s._wordsPull,
   getWordsRepeat: (s) => s._wordsRepeat,

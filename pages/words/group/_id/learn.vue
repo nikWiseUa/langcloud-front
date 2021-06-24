@@ -76,11 +76,6 @@ export default {
     async chouseAnswer(ind) {
       this.isRigthAnswer = await this.submitChouse(ind);
       this.inChouse = false;
-      if (this.isRigthAnswer) {
-        console.log(this.isRigthAnswer);
-      } else {
-        console.log(this.isRigthAnswer, false);
-      }
     },
     nextStep(type) {
       if (type === 'done') {
@@ -89,7 +84,6 @@ export default {
         this.setNewRepeatWord(this.currentWord);
       }
       if (this.wordsPull.length + this.wordsRepeat.length === 0) {
-        console.log('game over');
         this.$router.push('/words');
       }
       this.inChouse = true;
